@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "chrome-types": "^0.1.258"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
