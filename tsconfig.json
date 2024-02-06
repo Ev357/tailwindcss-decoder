@@ -17,6 +17,6 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["chrome-types", "@types/bun"]
+    "types": ["chrome-types"]
   }
 }
