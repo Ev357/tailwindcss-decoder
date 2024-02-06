@@ -55,5 +55,5 @@ export const getDecompiledElement = async (section: Element) => {
   );
 
   // console.log(element.innerHTML);
-  console.log(await getClasses([".xv"]));
+  console.log(await getClasses([".xz"]));
 };

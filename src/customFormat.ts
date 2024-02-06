@@ -1,9 +1,16 @@
-import { cssUnits } from "./data/regex/cssUnits";
-import type { CssUnit } from "./data/regex/cssUnits";
+import { cssUnits, type CssUnit } from "./data/regex/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
 import { getTwZIndex } from "./functions/getTwZIndex";
 import { cssCursors, type CssCursor } from "./data/regex/cssCursors";
 import { getTwCursor } from "./functions/getTwCursor";
+import {
+  cssSpacing,
+  cssSpacingDirection,
+  type CssSpacing,
+  type CssSpacingDirection,
+} from "./data/regex/cssSpacing";
+import { getTwDoubleScroll } from "./functions/getTwDoubleScroll";
+import { getOppositeDirection } from "./functions/getOppositeDirection";
 
 type FormatFunction = (cssStyle: CSSStyleRule) => string | undefined;
 
@@ -107,7 +114,7 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
     (cssRule) => {
       // cursor-Cursor
       const regexResult = new RegExp(
-        `^\.[a-z]* { cursor: (${cssCursors}); }$`,
+        `^\\.[a-z]* { cursor: (${cssCursors}); }$`,
         "g"
       ).exec(cssRule.cssText);
 
@@ -120,6 +127,39 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
         const cursor = getTwCursor(value);
 
         return `cursor-${cursor}`;
+      }
+
+      return undefined;
+    },
+    (cssRule) => {
+      // -?scroll-(p|m)(x|y)-[0-9]*CssUnit
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { scroll-(${cssSpacing})-(${cssSpacingDirection}): (-?[0-9|.]*)(${cssUnits}); scroll-(${cssSpacing})-(${cssSpacingDirection}): (-?[0-9|.]*)(${cssUnits}); }$`,
+        "g"
+      ).exec(cssRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 9) {
+          return undefined;
+        }
+        const spacing1 = regexResult[1] as CssSpacing;
+        const spacingDirection1 = regexResult[2] as CssSpacingDirection;
+        const value1 = regexResult[3];
+        const unit1 = regexResult[4] as CssUnit;
+
+        const spacing2 = regexResult[5] as CssSpacing;
+        const spacingDirection2 = regexResult[6] as CssSpacingDirection;
+        const value2 = regexResult[7];
+        const unit2 = regexResult[8] as CssUnit;
+
+        if (spacing1 !== spacing2 || value1 !== value2 || unit1 !== unit2) {
+          return undefined;
+        }
+        if (spacingDirection1 !== getOppositeDirection(spacingDirection2)) {
+          return undefined;
+        }
+
+        return getTwDoubleScroll(spacing1, spacingDirection1, value1, unit1);
       }
 
       return undefined;

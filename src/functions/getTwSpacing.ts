@@ -1,4 +1,4 @@
-import type { CssUnit } from "../data/cssUnits";
+import type { CssUnit } from "../data/regex/cssUnits";
 import { spacing } from "../data/tailwindConfig/spacing";
 
 interface GetTwSpacingResult {

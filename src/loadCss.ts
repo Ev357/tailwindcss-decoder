@@ -54,7 +54,7 @@ export const loadCss = async (section: Element) => {
         const { code, data } = CssToTailwindTranslator(cssRule.cssText);
 
         // TODO Remove
-        if (cssRule.cssText.includes(".xv {")) {
+        if (cssRule.cssText.includes(".xz {")) {
           console.log(cssRule.cssText);
         }
 
