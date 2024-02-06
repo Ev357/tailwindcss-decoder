@@ -1,7 +1,9 @@
-import { cssUnits } from "./data/cssUnits";
-import type { CssUnit } from "./data/cssUnits";
+import { cssUnits } from "./data/regex/cssUnits";
+import type { CssUnit } from "./data/regex/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
 import { getTwZIndex } from "./functions/getTwZIndex";
+import { cssCursors, type CssCursor } from "./data/regex/cssCursors";
+import { getTwCursor } from "./functions/getTwCursor";
 
 type FormatFunction = (cssStyle: CSSStyleRule) => string | undefined;
 
@@ -98,6 +100,26 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
         const zIndex = getTwZIndex(value);
 
         return `${zIndex.isNegative ? "-" : ""}z-${zIndex.index}`;
+      }
+
+      return undefined;
+    },
+    (cssRule) => {
+      // cursor-Cursor
+      const regexResult = new RegExp(
+        `^\.[a-z]* { cursor: (${cssCursors}); }$`,
+        "g"
+      ).exec(cssRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 2) {
+          return undefined;
+        }
+        const value = regexResult[1] as CssCursor;
+
+        const cursor = getTwCursor(value);
+
+        return `cursor-${cursor}`;
       }
 
       return undefined;
