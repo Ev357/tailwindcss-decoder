@@ -6,6 +6,13 @@ const getClasses = async (classNames: string[]) => {
   return Object.values(decodedClasses).filter(Boolean);
 };
 
+const createElement = (html: string) => {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  return div;
+};
+
 export const getDecompiledElement = async (section: Element) => {
   const iframe = section.querySelector("iframe");
 
@@ -18,24 +25,34 @@ export const getDecompiledElement = async (section: Element) => {
     return;
   }
 
-  const element = contentWindow.document
-    .querySelector("div[id=app]")
-    ?.cloneNode(true);
+  const compiledElement = contentWindow.document.querySelector("div[id=app]");
+  if (!compiledElement) {
+    return;
+  }
+
+  const element = createElement(compiledElement.innerHTML);
   if (!element) {
     return;
   }
 
-  const allElements = Array.from((<Element>element).getElementsByTagName("*"));
+  const allElements = Array.from(element.querySelectorAll("*"));
 
-  await allElements.forEach(async (element) => {
-    const compiledClassList = element.className
-      .split(" ")
-      .map((className) => `.${className}`);
+  await Promise.all(
+    allElements.map<void>(async (element) => {
+      const classes = element.getAttribute("class");
+      if (!classes) {
+        return;
+      }
 
-    const decompiledClasses = await getClasses(compiledClassList);
+      const compiledClassList = classes
+        .split(" ")
+        .map((className) => `.${className}`);
 
-    element.className = decompiledClasses.join(" ");
-  });
+      const decompiledClasses = await getClasses(compiledClassList);
 
-  console.log(element);
+      element.setAttribute("class", decompiledClasses.join(" "));
+    })
+  );
+
+  console.log(element.innerHTML);
 };
