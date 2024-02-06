@@ -7,12 +7,13 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "chrome-types": "^0.1.258"
+    "chrome-types": "^0.1.258",
+    "tailwindcss": "^3.4.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "css-to-tailwind-translator": "^1.2.8"
+    "css-to-tailwindcss": "^1.0.5"
   }
 }

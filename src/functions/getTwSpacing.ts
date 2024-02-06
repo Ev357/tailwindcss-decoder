@@ -1,5 +1,5 @@
 import type { CssUnit } from "../data/regex/cssUnits";
-import { spacing } from "../data/tailwindConfig/spacing";
+import { fullConfig } from "../tailwindConfig";
 
 interface GetTwSpacingResult {
   classUnit: string;
@@ -11,6 +11,12 @@ export const getTwSpacing = (value: string, unit: CssUnit) => {
   if (isNegative) {
     value = value.slice(1);
   }
+
+  const spacing = fullConfig.theme?.spacing;
+  if (!spacing) {
+    return terminate(value, unit, isNegative);
+  }
+
   const twUnit = Object.entries(spacing).find(
     (spacing) => spacing[1] === `${value}${unit}`
   )?.[0];
@@ -18,11 +24,14 @@ export const getTwSpacing = (value: string, unit: CssUnit) => {
     return {
       classUnit: twUnit,
       isNegative,
-    } satisfies GetTwSpacingResult;
+    } as const satisfies GetTwSpacingResult;
   }
 
-  return {
+  return terminate(value, unit, isNegative);
+};
+
+const terminate = (value: string, unit: CssUnit, isNegative: boolean) =>
+  ({
     classUnit: `[${value}${unit}]`,
     isNegative,
-  } satisfies GetTwSpacingResult;
-};
+  } as const satisfies GetTwSpacingResult);

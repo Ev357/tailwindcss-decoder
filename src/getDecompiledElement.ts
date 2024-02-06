@@ -37,7 +37,7 @@ export const getDecompiledElement = async (section: Element) => {
 
   const allElements = Array.from(element.querySelectorAll("*"));
 
-  await Promise.all(
+  await Promise.allSettled(
     allElements.map<void>(async (element) => {
       const classes = element.getAttribute("class");
       if (!classes) {
@@ -54,6 +54,6 @@ export const getDecompiledElement = async (section: Element) => {
     })
   );
 
-  // console.log(element.innerHTML);
-  console.log(await getClasses([".xz"]));
+  console.log(element.innerHTML);
+  //console.log(await getClasses([".b"]));
 };

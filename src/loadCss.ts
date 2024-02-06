@@ -1,18 +1,11 @@
-import { CssToTailwindTranslator } from "css-to-tailwind-translator";
+import { TailwindConverter } from "css-to-tailwindcss";
 import { customFormat } from "./customFormat";
+import { tailwindConfig } from "./tailwindConfig";
 
 const storeClasses = async (classes: Record<string, string>) =>
   await chrome.storage.local.set(classes);
 
-const blackListClasses: string[] = [
-  "::before, ::after",
-  "abbr:where([title])",
-  "*, ::before, ::after",
-  "::backdrop",
-  "html",
-  '.p :where(ul > li):not(:where([class~="not-prose"] *))::marker',
-  '.p :where(a code):not(:where([class~="not-prose"] *))',
-];
+const blackListClasses: string[] = ["> *", ":where", ":not"];
 
 export const loadCss = async (section: Element) => {
   const iframe = section.querySelector("iframe");
@@ -37,56 +30,44 @@ export const loadCss = async (section: Element) => {
   }
 
   const cssRules = Array.from(compiledStyleSheet.cssRules) as CSSStyleRule[];
+
   const chucksCount = 20;
   const chunkSize = Math.floor(cssRules.length / chucksCount);
 
-  const testSet = new Set<string>();
+  const converter = new TailwindConverter({
+    remInPx: null,
+    arbitraryPropertiesIsEnabled: true,
+    postCSSPlugins: undefined,
+    tailwindConfig,
+  });
 
   for (let i = 0; i < cssRules.length; i += chunkSize) {
     const chunk = cssRules.slice(i, Math.min(i + chunkSize, cssRules.length));
 
-    const chunkClasses = chunk.reduce<Record<string, string>>(
-      (chunkClasses, cssRule) => {
-        if (cssRule.cssText.includes("@font-face")) {
-          return chunkClasses;
-        }
+    const chunkClasses: Record<string, string> = {};
 
-        const { code, data } = CssToTailwindTranslator(cssRule.cssText);
-
-        // TODO Remove
-        if (cssRule.cssText.includes(".xz {")) {
-          console.log(cssRule.cssText);
+    await Promise.allSettled(
+      chunk.map<void>(async (cssRule) => {
+        if (!new RegExp("^\\.[a-z]* {.+").test(cssRule.cssText)) {
+          return;
         }
 
         const customClass = customFormat(cssRule);
         if (customClass) {
           chunkClasses[cssRule.selectorText] = customClass;
-          return chunkClasses;
+          return;
         }
 
-        if (code === "SyntaxError") {
-          return chunkClasses;
+        const { nodes } = await converter.convertCSS(cssRule.cssText);
+
+        if (!nodes.length) {
+          return;
         }
 
-        data.forEach((resultCode) => {
-          if (!resultCode.resultVal) {
-            if (!blackListClasses.includes(resultCode.selectorName)) {
-              testSet.add(resultCode.selectorName);
-            }
-
-            return;
-          }
-
-          chunkClasses[resultCode.selectorName] = resultCode.resultVal;
-        });
-
-        return chunkClasses;
-      },
-      {}
+        chunkClasses[cssRule.selectorText] = nodes[0].tailwindClasses.join(" ");
+      })
     );
 
     await storeClasses(chunkClasses);
   }
-
-  console.log(Array.from(testSet));
 };
