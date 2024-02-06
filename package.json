@@ -2,11 +2,17 @@
   "name": "tailwindcss-decoder",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "mkdir -p dist && cp -r ./public/* ./dist && bun build ./src/index.ts --minify --splitting --outdir dist/"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "chrome-types": "^0.1.258"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "css-to-tailwind-translator": "^1.2.8"
   }
 }
