@@ -1,4 +1,11 @@
 {
-  "cSpell.words": ["Decompiled", "outdir", "tailwindcss", "vmax", "vmin"],
+  "cSpell.words": [
+    "Decompiled",
+    "nesw",
+    "outdir",
+    "tailwindcss",
+    "vmax",
+    "vmin"
+  ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

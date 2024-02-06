@@ -54,7 +54,7 @@ export const loadCss = async (section: Element) => {
         const { code, data } = CssToTailwindTranslator(cssRule.cssText);
 
         // TODO Remove
-        if (cssRule.cssText.includes(".ed {")) {
+        if (cssRule.cssText.includes(".xl {")) {
           console.log(cssRule.cssText);
         }
 

@@ -1,6 +1,7 @@
 import { cssUnits } from "./data/cssUnits";
 import type { CssUnit } from "./data/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
+import { getTwZIndex } from "./functions/getTwZIndex";
 
 type FormatFunction = (cssStyle: CSSStyleRule) => string | undefined;
 
@@ -61,7 +62,7 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
       return undefined;
     },
     (cssRule) => {
-      // inset-[0-9]*CssUnit
+      // -?inset-[0-9]*CssUnit
       const regexResult = new RegExp(
         `^\\.[a-z]* { inset: (-?[0-9|.]*)(${cssUnits}); }$`,
         "g"
@@ -77,6 +78,26 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
         const spacing = getTwSpacing(value, unit);
 
         return `${spacing.isNegative ? "-" : ""}inset-${spacing.classUnit}`;
+      }
+
+      return undefined;
+    },
+    (cssRule) => {
+      // -?z-[0-9]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { z-index: (-?[0-9]*); }$`,
+        "g"
+      ).exec(cssRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 2) {
+          return undefined;
+        }
+        const value = regexResult[1];
+
+        const zIndex = getTwZIndex(value);
+
+        return `${zIndex.isNegative ? "-" : ""}z-${zIndex.index}`;
       }
 
       return undefined;
