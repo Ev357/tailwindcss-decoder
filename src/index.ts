@@ -10,7 +10,7 @@ import { getDecompiledElement } from "./getDecompiledElement";
     }
   });
 
-  await paidSections.forEach(async (section) => {
+  await [paidSections[0]].forEach(async (section) => {
     await loadCss(section);
     getDecompiledElement(section);
   });
