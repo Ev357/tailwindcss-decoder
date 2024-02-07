@@ -1,7 +1,7 @@
 import type { RecursiveKeyValuePair, ResolvableTo } from "tailwindcss/types/config";
 import { fullConfig } from "../tailwindConfig";
 
-export const getTwColor = (red: string, green: string, blue: string, source: ResolvableTo<RecursiveKeyValuePair<string, string>> | undefined) => {
+export const getTwColor = (red: string, green: string, blue: string, source?: ResolvableTo<RecursiveKeyValuePair<string, string>>) => {
   const colors = source !== undefined ? source : fullConfig.theme?.colors;
   if (!colors) {
     throw Error("colors not set!");

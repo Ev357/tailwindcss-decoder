@@ -10,7 +10,7 @@ interface GetTwSpacingResult {
 export const getTwSpacing = (
   value: string,
   unit: CssUnit,
-  source: ResolvableTo<KeyValuePair<string, string>> | undefined = undefined
+  source?: ResolvableTo<KeyValuePair<string, string>>
 ) => {
   const isNegative = value.startsWith("-");
   if (isNegative) {

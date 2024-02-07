@@ -1,16 +1,14 @@
 import type { CssSpacingDirection } from "../data/cssSpacing";
 
 export const getOppositeDirection = (direction: CssSpacingDirection) => {
-  if (direction === "top") {
-    return "bottom";
-  }
-  if (direction === "right") {
-    return "left";
-  }
-  if (direction === "bottom") {
-    return "top";
-  }
-  if (direction === "left") {
-    return "right";
+  switch (direction) {
+    case "top":
+      return "bottom";
+    case "right":
+      return "left";
+    case "bottom":
+      return "top";
+    case "left":
+      return "right";
   }
 };

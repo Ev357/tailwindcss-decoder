@@ -51,7 +51,7 @@ export const loadCss = async (section: Element) => {
       }
 
       // TODO Remove
-      if (node.selector.startsWith(".bah")) {
+      if (node.selector.startsWith(".avq")) {
         console.log(cssText);
       }
 
@@ -88,6 +88,10 @@ export const loadCss = async (section: Element) => {
         if (!nodes.length) {
           return;
         }
+
+        // if (nodes[0].tailwindClasses.join(" ").includes("leading")) {
+        //   console.log(nodes[0].tailwindClasses, twRule);
+        // }
 
         chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses.join(" ");
       })

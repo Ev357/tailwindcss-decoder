@@ -5,6 +5,7 @@ import type { TwRule } from "./loadCss";
 import { getTwColorOpacity } from "./functions/getTwColorOpacity";
 import { getTwBackgroundColor } from "./functions/getTwBackgroundColor";
 import { getTwTextColor } from "./functions/getTwTextColor";
+import { getTwFontSize } from "./functions/getTwFontSize";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -213,6 +214,43 @@ export const customFormat = (twRule: TwRule) => {
         const borderOpacity = getTwColorOpacity(opacity);
 
         return `${textClass}${borderOpacity}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // text-TwFontSize
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { font-size: ([0-9.]*(${cssUnits})); line-height: ([0-9.]*(${cssUnits})?); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 4) {
+          return undefined;
+        }
+        const fontSize = regexResult[1];
+        const lineHeight = regexResult[3];
+
+        return getTwFontSize(fontSize, lineHeight);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // text-[CssSize]
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { font-size: ([0-9.]*(${cssUnits})); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 3) {
+          return undefined;
+        }
+        const fontSize = regexResult[1];
+
+        return getTwFontSize(fontSize);
       }
 
       return undefined;
