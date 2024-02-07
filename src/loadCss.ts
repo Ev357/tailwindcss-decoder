@@ -51,7 +51,7 @@ export const loadCss = async (section: Element) => {
       }
 
       // TODO Remove
-      if (node.selector.startsWith(".awy")) {
+      if (node.selector.startsWith(".bah")) {
         console.log(cssText);
       }
 

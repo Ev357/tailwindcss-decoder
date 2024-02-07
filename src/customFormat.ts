@@ -4,6 +4,7 @@ import { getTwBorder } from "./functions/getTwBorder";
 import type { TwRule } from "./loadCss";
 import { getTwColorOpacity } from "./functions/getTwColorOpacity";
 import { getTwBackgroundColor } from "./functions/getTwBackgroundColor";
+import { getTwTextColor } from "./functions/getTwTextColor";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -168,6 +169,50 @@ export const customFormat = (twRule: TwRule) => {
         const borderOpacity = getTwColorOpacity(opacity);
 
         return `${bgClass}${borderOpacity}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // text-TwColor
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-text-opacity: 1; color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-text-opacity\\)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 4) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+
+        return getTwTextColor(red, green, blue);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // text-TwColor/[0-9.]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 5) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+        const opacity = regexResult[4];
+
+        const textClass = getTwTextColor(red, green, blue);
+        const borderOpacity = getTwColorOpacity(opacity);
+
+        return `${textClass}${borderOpacity}`;
       }
 
       return undefined;
