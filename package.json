@@ -14,6 +14,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "css-to-tailwindcss": "^1.0.5"
+    "css-to-tailwindcss": "^1.0.5",
+    "postcss": "^8.4.34"
   }
 }

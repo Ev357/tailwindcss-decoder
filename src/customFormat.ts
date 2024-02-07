@@ -1,28 +1,19 @@
-import { cssUnits, type CssUnit } from "./data/regex/cssUnits";
+import { cssUnits, type CssUnit } from "./data/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
-import { getTwZIndex } from "./functions/getTwZIndex";
-import { cssCursors, type CssCursor } from "./data/regex/cssCursors";
-import { getTwCursor } from "./functions/getTwCursor";
-import {
-  cssSpacing,
-  cssSpacingDirection,
-  type CssSpacing,
-  type CssSpacingDirection,
-} from "./data/regex/cssSpacing";
-import { getTwScroll } from "./functions/getTwScroll";
-import { getOppositeDirection } from "./functions/getOppositeDirection";
+import { getTwBorder } from "./functions/getTwBorder";
+import type { TwRule } from "./loadCss";
 
-type FormatFunction = (cssStyle: CSSStyleRule) => string | undefined;
+type FormatFunction = (twRule: TwRule) => string | undefined;
 
-export const customFormat = (cssStyle: CSSStyleRule) => {
+export const customFormat = (twRule: TwRule) => {
   const formatFunctions: FormatFunction[] = [
-    (cssRule) => {
+    (twRule) => {
       // aspect-h-[0-9]*
       // TODO JIT support
       const regexResult = new RegExp(
         "^\\.[a-z]* { --tw-aspect-h: ([0-9]*); }$",
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
         if (regexResult.length < 2) {
@@ -35,13 +26,13 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
 
       return undefined;
     },
-    (cssRule) => {
+    (twRule) => {
       // aspect-w-[0-9]*
       // TODO JIT support
       const regexResult = new RegExp(
         "^\\.[a-z]* { position: relative; padding-bottom: calc\\(var\\(--tw-aspect-h\\) \\/ var\\(--tw-aspect-w\\) \\* 100%\\); --tw-aspect-w: ([0-9]*); }$",
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
         if (regexResult.length < 2) {
@@ -54,13 +45,13 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
 
       return undefined;
     },
-    (cssRule) => {
+    (twRule) => {
       // prose-indigo
       // TODO Colors
       const regexResult = new RegExp(
         "^\\.[a-z]* { --tw-prose-links: #4f46e5; --tw-prose-invert-links: #6366f1; }$",
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
         const value = regexResult[0];
@@ -70,12 +61,12 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
 
       return undefined;
     },
-    (cssRule) => {
+    (twRule) => {
       // -?inset-[0-9]*CssUnit
       const regexResult = new RegExp(
-        `^\\.[a-z]* { inset: (-?[0-9|.]*)(${cssUnits}); }$`,
+        `^\\.[a-z]* { inset: (-?[0-9.]*)(${cssUnits}); }$`,
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
         if (regexResult.length < 3) {
@@ -91,96 +82,42 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
 
       return undefined;
     },
-    (cssRule) => {
-      // -?z-[0-9]*
+    (twRule) => {
+      // border-TwColor
       const regexResult = new RegExp(
-        `^\\.[a-z]* { z-index: (-?[0-9]*); }$`,
+        `^\\.[a-z]* { --tw-border-opacity: 1; border-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-border-opacity\\)\\); }$`,
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
-        if (regexResult.length < 2) {
+        if (regexResult.length < 4) {
           return undefined;
         }
-        const value = regexResult[1];
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
 
-        const zIndex = getTwZIndex(value);
-
-        return `${zIndex.isNegative ? "-" : ""}z-${zIndex.index}`;
+        return getTwBorder(red, green, blue);
       }
 
       return undefined;
     },
-    (cssRule) => {
-      // cursor-Cursor
+    (twRule) => {
+      // border-TwColor/[0-9.]
       const regexResult = new RegExp(
-        `^\\.[a-z]* { cursor: (${cssCursors}); }$`,
+        `^\\.[a-z]* { --tw-border-opacity: 1; border-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-border-opacity\\)\\); }$`,
         "g"
-      ).exec(cssRule.cssText);
+      ).exec(twRule.cssText);
 
       if (regexResult) {
-        if (regexResult.length < 2) {
+        if (regexResult.length < 4) {
           return undefined;
         }
-        const value = regexResult[1] as CssCursor;
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
 
-        const cursor = getTwCursor(value);
-
-        return `cursor-${cursor}`;
-      }
-
-      return undefined;
-    },
-    (cssRule) => {
-      // -?scroll-(p|m)(t|r|b|l)-[0-9]*CssUnit
-      const regexResult = new RegExp(
-        `^\\.[a-z]* { scroll-(${cssSpacing})-(${cssSpacingDirection}): (-?[0-9|.]*)(${cssUnits}); }$`,
-        "g"
-      ).exec(cssRule.cssText);
-
-      if (regexResult) {
-        if (regexResult.length < 5) {
-          return undefined;
-        }
-        const spacing = regexResult[1] as CssSpacing;
-        const spacingDirection = regexResult[2] as CssSpacingDirection;
-        const value = regexResult[3];
-        const unit = regexResult[4] as CssUnit;
-
-        return getTwScroll(spacing, spacingDirection, value, unit);
-      }
-
-      return undefined;
-    },
-    (cssRule) => {
-      // -?scroll-(p|m)(x|y)-[0-9]*CssUnit
-      const regexResult = new RegExp(
-        `^\\.[a-z]* { scroll-(${cssSpacing})-(${cssSpacingDirection}): (-?[0-9|.]*)(${cssUnits}); scroll-(${cssSpacing})-(${cssSpacingDirection}): (-?[0-9|.]*)(${cssUnits}); }$`,
-        "g"
-      ).exec(cssRule.cssText);
-
-      if (regexResult) {
-        if (regexResult.length < 9) {
-          return undefined;
-        }
-        const spacing1 = regexResult[1] as CssSpacing;
-        const spacingDirection1 = regexResult[2] as CssSpacingDirection;
-        const value1 = regexResult[3];
-        const unit1 = regexResult[4] as CssUnit;
-
-        const spacing2 = regexResult[5] as CssSpacing;
-        const spacingDirection2 = regexResult[6] as CssSpacingDirection;
-        const value2 = regexResult[7];
-        const unit2 = regexResult[8] as CssUnit;
-
-        if (spacing1 !== spacing2 || value1 !== value2 || unit1 !== unit2) {
-          return undefined;
-        }
-        if (spacingDirection1 !== getOppositeDirection(spacingDirection2)) {
-          return undefined;
-        }
-
-        return getTwScroll(spacing1, spacingDirection1, value1, unit1, true);
+        return getTwBorder(red, green, blue);
       }
 
       return undefined;
@@ -190,7 +127,7 @@ export const customFormat = (cssStyle: CSSStyleRule) => {
   let resultClass: string | undefined;
 
   for (let formatFunction of formatFunctions) {
-    const result = formatFunction(cssStyle);
+    const result = formatFunction(twRule);
 
     if (result) {
       resultClass = result;

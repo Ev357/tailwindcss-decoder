@@ -1,7 +1,5 @@
-import { resolveConfig } from "css-to-tailwindcss/lib/utils/resolveConfig";
-import type { TailwindConverterConfig } from "css-to-tailwindcss";
-
-type Config = Exclude<TailwindConverterConfig["tailwindConfig"], undefined>;
+import resolveConfig from "tailwindcss/resolveConfig";
+import type { Config } from "tailwindcss";
 
 export const tailwindConfig = {
   content: ["auto"],

@@ -1,6 +1,12 @@
 import { TailwindConverter } from "css-to-tailwindcss";
 import { customFormat } from "./customFormat";
 import { tailwindConfig } from "./tailwindConfig";
+import { parse, type Rule } from "postcss";
+
+export interface TwRule {
+  rule: Rule;
+  cssText: string;
+}
 
 const storeClasses = async (classes: Record<string, string>) =>
   await chrome.storage.local.set(classes);
@@ -21,50 +27,64 @@ export const loadCss = async (section: Element) => {
 
   const sheets = Array.from(contentWindow.document.styleSheets);
 
-  const compiledStyleSheet = sheets.find((sheet) =>
+  const compiledStyleSheetHref = sheets.find((sheet) =>
     sheet?.href?.includes("compiled.css")
-  );
+  )?.href;
 
-  if (!compiledStyleSheet) {
+  if (!compiledStyleSheetHref) {
     return;
   }
 
-  const cssRules = Array.from(compiledStyleSheet.cssRules) as CSSStyleRule[];
+  const response = await fetch(compiledStyleSheetHref);
+  const css = await response.text();
+  const parsedCss = parse(css);
+
+  const twRules = parsedCss.nodes.reduce<TwRule[]>((cssRules, node) => {
+    if (node.type === "rule") {
+      const cssText = node
+        .toString()
+        .replaceAll("\n", " ")
+        .replaceAll(new RegExp(" {2,}", "g"), " ");
+
+      if (!new RegExp("^\\.[a-z]* {.+").test(cssText)) {
+        return cssRules;
+      }
+
+      cssRules.push({ rule: node, cssText });
+    }
+
+    return cssRules;
+  }, []);
 
   const chucksCount = 20;
-  const chunkSize = Math.floor(cssRules.length / chucksCount);
+  const chunkSize = Math.floor(twRules.length / chucksCount);
 
   const converter = new TailwindConverter({
     remInPx: null,
     arbitraryPropertiesIsEnabled: true,
-    postCSSPlugins: undefined,
     tailwindConfig,
   });
 
-  for (let i = 0; i < cssRules.length; i += chunkSize) {
-    const chunk = cssRules.slice(i, Math.min(i + chunkSize, cssRules.length));
+  for (let i = 0; i < twRules.length; i += chunkSize) {
+    const chunk = twRules.slice(i, Math.min(i + chunkSize, twRules.length));
 
     const chunkClasses: Record<string, string> = {};
 
     await Promise.allSettled(
-      chunk.map<void>(async (cssRule) => {
-        if (!new RegExp("^\\.[a-z]* {.+").test(cssRule.cssText)) {
-          return;
-        }
-
-        const customClass = customFormat(cssRule);
+      chunk.map<void>(async (twRule) => {
+        const customClass = customFormat(twRule);
         if (customClass) {
-          chunkClasses[cssRule.selectorText] = customClass;
+          chunkClasses[twRule.rule.selector] = customClass;
           return;
         }
 
-        const { nodes } = await converter.convertCSS(cssRule.cssText);
+        const { nodes } = await converter.convertCSS(twRule.cssText);
 
         if (!nodes.length) {
           return;
         }
 
-        chunkClasses[cssRule.selectorText] = nodes[0].tailwindClasses.join(" ");
+        chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses.join(" ");
       })
     );
 

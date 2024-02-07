@@ -1,4 +1,4 @@
-import type { CssSpacingDirection } from "../data/regex/cssSpacing";
+import type { CssSpacingDirection } from "../data/cssSpacing";
 
 export const getOppositeDirection = (direction: CssSpacingDirection) => {
   if (direction === "top") {
