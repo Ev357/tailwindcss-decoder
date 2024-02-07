@@ -3,6 +3,7 @@ import { getTwSpacing } from "./functions/getTwSpacing";
 import { getTwBorder } from "./functions/getTwBorder";
 import type { TwRule } from "./loadCss";
 import { getTwColorOpacity } from "./functions/getTwColorOpacity";
+import { getTwBackgroundColor } from "./functions/getTwBackgroundColor";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -104,7 +105,7 @@ export const customFormat = (twRule: TwRule) => {
       return undefined;
     },
     (twRule) => {
-      // border-TwColor/[0-9.]
+      // border-TwColor/[0-9.]*
       const regexResult = new RegExp(
         `^\\.[a-z]* { border-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
         "g"
@@ -120,9 +121,53 @@ export const customFormat = (twRule: TwRule) => {
         const opacity = regexResult[4];
 
         const borderClass = getTwBorder(red, green, blue);
-        const borderOpacity = getTwColorOpacity(opacity)
+        const borderOpacity = getTwColorOpacity(opacity);
 
         return `${borderClass}${borderOpacity}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // bg-TwColor
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-bg-opacity: 1; background-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-bg-opacity\\)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 4) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+
+        return getTwBackgroundColor(red, green, blue);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // bg-TwColor/[0-9.]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { background-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 5) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+        const opacity = regexResult[4];
+
+        const bgClass = getTwBackgroundColor(red, green, blue);
+        const borderOpacity = getTwColorOpacity(opacity);
+
+        return `${bgClass}${borderOpacity}`;
       }
 
       return undefined;
