@@ -2,6 +2,7 @@ import { cssUnits, type CssUnit } from "./data/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
 import { getTwBorder } from "./functions/getTwBorder";
 import type { TwRule } from "./loadCss";
+import { getTwColorOpacity } from "./functions/getTwColorOpacity";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -105,19 +106,23 @@ export const customFormat = (twRule: TwRule) => {
     (twRule) => {
       // border-TwColor/[0-9.]
       const regexResult = new RegExp(
-        `^\\.[a-z]* { --tw-border-opacity: 1; border-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-border-opacity\\)\\); }$`,
+        `^\\.[a-z]* { border-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
         "g"
       ).exec(twRule.cssText);
 
       if (regexResult) {
-        if (regexResult.length < 4) {
+        if (regexResult.length < 5) {
           return undefined;
         }
         const red = regexResult[1];
         const green = regexResult[2];
         const blue = regexResult[3];
+        const opacity = regexResult[4];
 
-        return getTwBorder(red, green, blue);
+        const borderClass = getTwBorder(red, green, blue);
+        const borderOpacity = getTwColorOpacity(opacity)
+
+        return `${borderClass}${borderOpacity}`;
       }
 
       return undefined;

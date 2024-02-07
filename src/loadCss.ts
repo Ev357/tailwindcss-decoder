@@ -50,6 +50,11 @@ export const loadCss = async (section: Element) => {
         return cssRules;
       }
 
+      // TODO Remove
+      if (node.selector.startsWith(".aix")) {
+        console.log(cssText);
+      }
+
       cssRules.push({ rule: node, cssText });
     }
 
