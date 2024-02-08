@@ -83,11 +83,6 @@ export const loadCss = async (section: Element) => {
               return twRules;
             }
 
-            // // TODO Remove
-            // if (childNode.selector.startsWith(".avq")) {
-            //   console.log(cssText);
-            // }
-
             twRules[1].push({ rule: childNode, cssText, breakpoint });
           }
         }
@@ -98,11 +93,11 @@ export const loadCss = async (section: Element) => {
     [[], []]
   );
 
+  setupWarning();
   const converter = new TailwindConverter({
     remInPx: null,
     arbitraryPropertiesIsEnabled: true,
     tailwindConfig,
-    postCSSPlugins: undefined,
   });
 
   let chucksCount = 20;
@@ -129,9 +124,9 @@ export const loadCss = async (section: Element) => {
           return;
         }
 
-        // if (nodes[0].tailwindClasses.join(" ").includes("leading")) {
-        //   console.log(nodes[0].tailwindClasses, twRule);
-        // }
+        if (twRule.rule.selector === ".bbo") {
+          console.log(nodes[0].tailwindClasses, twRule);
+        }
 
         chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses.join(" ");
       })
@@ -174,4 +169,19 @@ export const loadCss = async (section: Element) => {
 
     await storeClasses(chunkClasses);
   }
+};
+
+export const setupWarning = () => {
+  const originalWarn = console.warn;
+
+  console.warn = (...args) => {
+    if (
+      args[0].toString() ===
+      "Without `from` option PostCSS could generate wrong source map and will not find Browserslist config. Set it to CSS file path or to `undefined` to prevent this warning."
+    ) {
+      return;
+    }
+
+    originalWarn.apply(console, [...args]);
+  };
 };
