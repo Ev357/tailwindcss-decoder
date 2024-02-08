@@ -124,7 +124,7 @@ export const loadCss = async (section: Element) => {
           return;
         }
 
-        if (twRule.rule.selector === ".bbo") {
+        if (nodes[0].tailwindClasses.join(" ").includes("offset")) {
           console.log(nodes[0].tailwindClasses, twRule);
         }
 

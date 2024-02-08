@@ -8,6 +8,7 @@ import { getTwTextColor } from "./functions/getTwTextColor";
 import { getTwFontSize } from "./functions/getTwFontSize";
 import { getTwBoxShadowColor } from "./functions/getTwBoxShadowColor";
 import { getTwBoxShadow } from "./functions/getTwBoxShadow";
+import { getTwRingWidth } from "./functions/getTwRingWidth";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -325,9 +326,40 @@ export const customFormat = (twRule: TwRule) => {
           return undefined;
         }
 
-        console.log(getTwBoxShadow(boxShadow));
-
         return getTwBoxShadow(boxShadow);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // shadow-none
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-shadow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; box-shadow: var\\(--tw-ring-offset-shadow, 0 0 #0000\\), var\\(--tw-ring-shadow, 0 0 #0000\\), var\\(--tw-shadow\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        return "shadow-none";
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-TwSpacing
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-offset-shadow: var\\(--tw-ring-inset\\) 0 0 0 var\\(--tw-ring-offset-width\\) var\\(--tw-ring-offset-color\\); --tw-ring-shadow: var\\(--tw-ring-inset\\) 0 0 0 calc\\((-?[0-9.]*(${cssUnits})) \\+ var\\(--tw-ring-offset-width\\)\\) var\\(--tw-ring-color\\); box-shadow: var\\(--tw-ring-offset-shadow\\), var\\(--tw-ring-shadow\\), var\\(--tw-shadow, 0 0 #0000\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 3) {
+          return undefined;
+        }
+        const ringWidth = regexResult[1];
+
+        console.log(ringWidth);
+
+        return getTwRingWidth(ringWidth);
       }
 
       return undefined;
