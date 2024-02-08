@@ -10,7 +10,7 @@ import { getTwBoxShadowColor } from "./functions/getTwBoxShadowColor";
 import { getTwBoxShadow } from "./functions/getTwBoxShadow";
 import { getTwRingWidth } from "./functions/getTwRingWidth";
 import { getTwRingColor } from "./functions/getTwRingColor";
-import { getTwJITRingColor } from "./functions/getTwJITRingColor";
+import { getTwRingOpacity } from "./functions/getTwRingOpacity";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -402,24 +402,6 @@ export const customFormat = (twRule: TwRule) => {
       return undefined;
     },
     (twRule) => {
-      // ring-[TwColor]
-      const regexResult = new RegExp(
-        `^\\.[a-z]* { --tw-ring-color: (.*); }$`,
-        "g"
-      ).exec(twRule.cssText);
-
-      if (regexResult) {
-        if (regexResult.length < 2) {
-          return undefined;
-        }
-        const ringColor = regexResult[1];
-
-        return getTwJITRingColor(ringColor);
-      }
-
-      return undefined;
-    },
-    (twRule) => {
       // ring-TwColor/[0-9.]*
       const regexResult = new RegExp(
         `^\\.[a-z]* { --tw-ring-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
@@ -439,6 +421,42 @@ export const customFormat = (twRule: TwRule) => {
         const ringOpacity = getTwColorOpacity(opacity);
 
         return `${ringClass}${ringOpacity}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-opacity-[0-9]*
+      const regexResult = new RegExp(
+        "^\\.[a-z]* { --tw-ring-opacity: ([0-9.]*); }$",
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 2) {
+          return undefined;
+        }
+        const ringOpacity = regexResult[1];
+
+        return getTwRingOpacity(ringOpacity);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-offset-TwSpacing
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-offset-width: (-?[0-9.]*(${cssUnits})); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 3) {
+          return undefined;
+        }
+        const ringOffsetWidth = regexResult[1];
+
+        return getTwRingWidth(ringOffsetWidth);
       }
 
       return undefined;
