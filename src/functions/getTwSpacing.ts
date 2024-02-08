@@ -1,5 +1,4 @@
 import type { KeyValuePair, ResolvableTo } from "tailwindcss/types/config";
-import type { CssUnit } from "../data/cssUnits";
 import { fullConfig } from "../tailwindConfig";
 
 interface GetTwSpacingResult {
@@ -9,7 +8,6 @@ interface GetTwSpacingResult {
 
 export const getTwSpacing = (
   value: string,
-  unit: CssUnit,
   source?: ResolvableTo<KeyValuePair<string, string>>
 ) => {
   const isNegative = value.startsWith("-");
@@ -23,7 +21,7 @@ export const getTwSpacing = (
   }
 
   const twUnit = Object.entries(spacing).find(
-    (spacing) => spacing[1] === `${value}${unit}`
+    (spacing) => spacing[1] === value
   )?.[0];
   if (twUnit) {
     return {
@@ -33,7 +31,7 @@ export const getTwSpacing = (
   }
 
   return {
-    classUnit: `[${value}${unit}]`,
+    classUnit: `[${value}]`,
     isNegative,
   } as const satisfies GetTwSpacingResult;
 };

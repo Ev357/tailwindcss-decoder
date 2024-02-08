@@ -6,6 +6,8 @@ import { getTwColorOpacity } from "./functions/getTwColorOpacity";
 import { getTwBackgroundColor } from "./functions/getTwBackgroundColor";
 import { getTwTextColor } from "./functions/getTwTextColor";
 import { getTwFontSize } from "./functions/getTwFontSize";
+import { getTwBoxShadowColor } from "./functions/getTwBoxShadowColor";
+import { getTwBoxShadow } from "./functions/getTwBoxShadow";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -68,7 +70,7 @@ export const customFormat = (twRule: TwRule) => {
     (twRule) => {
       // -?inset-[0-9]*CssUnit
       const regexResult = new RegExp(
-        `^\\.[a-z]* { inset: (-?[0-9.]*)(${cssUnits}); }$`,
+        `^\.[a-z]* { inset: (-?[0-9.]*(${cssUnits})); }$`,
         "g"
       ).exec(twRule.cssText);
 
@@ -77,9 +79,8 @@ export const customFormat = (twRule: TwRule) => {
           return undefined;
         }
         const value = regexResult[1];
-        const unit = regexResult[2] as CssUnit;
 
-        const spacing = getTwSpacing(value, unit);
+        const spacing = getTwSpacing(value);
 
         return `${spacing.isNegative ? "-" : ""}inset-${spacing.classUnit}`;
       }
@@ -251,6 +252,82 @@ export const customFormat = (twRule: TwRule) => {
         const fontSize = regexResult[1];
 
         return getTwFontSize(fontSize);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // shadow-TwColor/[0-9.]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-shadow-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); --tw-shadow: var\\(--tw-shadow-colored\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 5) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+        const opacity = regexResult[4];
+
+        const textClass = getTwBoxShadowColor(red, green, blue);
+        const borderOpacity = getTwColorOpacity(opacity);
+
+        return `${textClass}${borderOpacity}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // shadow-TwSpacing (Small)
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-shadow: (([a-z0-9 -.]*) rgb\\([.0-9\\/ -]*\\)); --tw-shadow-colored: ([a-z0-9 -.]*) var\\(--tw-shadow-color\\); box-shadow: var\\(--tw-ring-offset-shadow, 0 0 #0000\\), var\\(--tw-ring-shadow, 0 0 #0000\\), var\\(--tw-shadow\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 4) {
+          return undefined;
+        }
+        const boxShadow = regexResult[1];
+        const smallPart = regexResult[2];
+        const coloredPart = regexResult[3];
+
+        if (smallPart !== coloredPart) {
+          return undefined;
+        }
+
+        return getTwBoxShadow(boxShadow);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // shadow-TwSpacing (Big)
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-shadow: (([a-z0-9 -.]*) rgb\\([.0-9\\/ -]*\\), ([a-z0-9 -.]*) rgb\\([.0-9\\/ -]*\\)); --tw-shadow-colored: ([a-z0-9 -.]*) var\\(--tw-shadow-color\\), ([a-z0-9 -.]*) var\\(--tw-shadow-color\\); box-shadow: var\\(--tw-ring-offset-shadow, 0 0 #0000\\), var\\(--tw-ring-shadow, 0 0 #0000\\), var\\(--tw-shadow\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 6) {
+          return undefined;
+        }
+        const boxShadow = regexResult[1];
+        const smallPart1 = regexResult[2];
+        const smallPart2 = regexResult[3];
+        const coloredPart1 = regexResult[4];
+        const coloredPart2 = regexResult[5];
+
+        if (smallPart1 !== coloredPart1 || smallPart2 !== coloredPart2) {
+          return undefined;
+        }
+
+        console.log(getTwBoxShadow(boxShadow));
+
+        return getTwBoxShadow(boxShadow);
       }
 
       return undefined;
