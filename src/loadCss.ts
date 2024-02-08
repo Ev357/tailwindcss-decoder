@@ -124,7 +124,7 @@ export const loadCss = async (section: Element) => {
           return;
         }
 
-        if (nodes[0].tailwindClasses.join(" ").includes("offset")) {
+        if (nodes[0].tailwindClasses.join(" ").includes("ring")) {
           console.log(nodes[0].tailwindClasses, twRule);
         }
 

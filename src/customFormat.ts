@@ -9,6 +9,8 @@ import { getTwFontSize } from "./functions/getTwFontSize";
 import { getTwBoxShadowColor } from "./functions/getTwBoxShadowColor";
 import { getTwBoxShadow } from "./functions/getTwBoxShadow";
 import { getTwRingWidth } from "./functions/getTwRingWidth";
+import { getTwRingColor } from "./functions/getTwRingColor";
+import { getTwJITRingColor } from "./functions/getTwJITRingColor";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -357,9 +359,86 @@ export const customFormat = (twRule: TwRule) => {
         }
         const ringWidth = regexResult[1];
 
-        console.log(ringWidth);
-
         return getTwRingWidth(ringWidth);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-inset
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-inset: inset; }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 1) {
+          return undefined;
+        }
+
+        return "ring-inset";
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-TwColor
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-opacity: 1; --tw-ring-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ var\\(--tw-ring-opacity\\)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 4) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+
+        return getTwRingColor(red, green, blue);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-[TwColor]
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-color: (.*); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 2) {
+          return undefined;
+        }
+        const ringColor = regexResult[1];
+
+        return getTwJITRingColor(ringColor);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // ring-TwColor/[0-9.]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 5) {
+          return undefined;
+        }
+        const red = regexResult[1];
+        const green = regexResult[2];
+        const blue = regexResult[3];
+        const opacity = regexResult[4];
+
+        const ringClass = getTwRingColor(red, green, blue);
+        const ringOpacity = getTwColorOpacity(opacity);
+
+        return `${ringClass}${ringOpacity}`;
       }
 
       return undefined;
