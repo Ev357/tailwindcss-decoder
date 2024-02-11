@@ -33,7 +33,7 @@ import { replaceData } from "./replaceData";
   if (wrongClasses.length) {
     const filteredMap = wrongClasses.reduce<Record<string, WrongClass>>(
       (wrongClasses, wrongClass) => {
-        wrongClasses[wrongClass.compiledClass] = wrongClass;
+        wrongClasses[wrongClass.cssText] = wrongClass;
         return wrongClasses;
       },
       {}
