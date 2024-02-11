@@ -18,7 +18,6 @@
     "128": "./assets/icon128.png"
   },
   "permissions": [
-    "activeTab",
     "storage"
   ],
   "host_permissions": [
@@ -31,6 +30,9 @@
       ],
       "js": [
         "index.js"
+      ],
+      "css": [
+        "./css/theme.css"
       ]
     }
   ],

@@ -2,6 +2,9 @@ import { panelHtml } from "./html/panel";
 import { createElement } from "./helpers/createElement";
 import { format } from "prettier";
 import parserHtml from "prettier/parser-html";
+import hljs from "highlight.js/lib/core";
+import hljsXml from "highlight.js/lib/languages/xml";
+import { createCodeElement } from "./helpers/createCodeElement";
 
 const openTabClasses =
   "flex items-center rounded-md bg-white py-[0.4375rem] pl-2 pr-2 text-sm font-semibold shadow lg:pr-3";
@@ -46,7 +49,9 @@ const copyComponent = (html: string, divButton: HTMLDivElement) => {
 const switchCode = (
   buttonType: "preview" | "code",
   event: MouseEvent,
-  otherButton: HTMLButtonElement
+  otherButton: HTMLButtonElement,
+  previewDiv: HTMLDivElement,
+  codePre: HTMLPreElement
 ) => {
   const target = <HTMLButtonElement | null>event.currentTarget;
   if (!target) {
@@ -65,6 +70,16 @@ const switchCode = (
   otherButton.setAttribute("data-headlessui-state", "");
   otherButton.setAttribute("aria-selected", "false");
   otherButton.setAttribute("class", closedTabClasses);
+
+  if (buttonType === "code") {
+    codePre.classList.remove("hidden");
+    previewDiv.classList.add("hidden");
+  }
+
+  if (buttonType === "preview") {
+    previewDiv.classList.remove("hidden");
+    codePre.classList.add("hidden");
+  }
 };
 
 export const replaceData = async (
@@ -117,13 +132,6 @@ export const replaceData = async (
     return;
   }
 
-  previewButton.addEventListener("click", (event) =>
-    switchCode("preview", event, codeButton)
-  );
-  codeButton.addEventListener("click", (event) =>
-    switchCode("code", event, previewButton)
-  );
-
   const prettifiedHtml = await format(decompiledDiv.innerHTML, {
     parser: "html",
     plugins: [parserHtml],
@@ -131,5 +139,34 @@ export const replaceData = async (
 
   clipboardDiv.addEventListener("click", () =>
     copyComponent(prettifiedHtml, clipboardDiv)
+  );
+
+  hljs.registerLanguage("xml", hljsXml);
+
+  const highlightedCode = hljs.highlight(prettifiedHtml, {
+    language: "xml",
+  }).value;
+
+  const codeElement = createCodeElement(highlightedCode);
+
+  const codeDiv: HTMLDivElement | null = section.querySelector("div.mt-4");
+  if (!codeDiv) {
+    return;
+  }
+
+  codeDiv.appendChild(codeElement);
+
+  const previewDiv: HTMLDivElement | null = codeDiv.querySelector(
+    "div.relative[id^=frame-]"
+  );
+  if (!previewDiv) {
+    return;
+  }
+
+  previewButton.addEventListener("click", (event) =>
+    switchCode("preview", event, codeButton, previewDiv, codeElement)
+  );
+  codeButton.addEventListener("click", (event) =>
+    switchCode("code", event, previewButton, previewDiv, codeElement)
   );
 };

@@ -11,7 +11,7 @@ import { replaceData } from "./replaceData";
     }
   });
 
-  await [paidSections[5]].forEach(async (section) => {
+  await paidSections.forEach(async (section) => {
     await loadCss(section);
     const decompiledDiv = await getDecompiledElement(section);
     if (!decompiledDiv) {
