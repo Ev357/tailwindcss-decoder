@@ -1,4 +1,4 @@
-import { cssUnits, type CssUnit } from "./data/cssUnits";
+import { cssUnits } from "./data/cssUnits";
 import { getTwSpacing } from "./functions/getTwSpacing";
 import { getTwBorder } from "./functions/getTwBorder";
 import type { TwRule } from "./loadCss";
@@ -11,6 +11,10 @@ import { getTwBoxShadow } from "./functions/getTwBoxShadow";
 import { getTwRingWidth } from "./functions/getTwRingWidth";
 import { getTwRingColor } from "./functions/getTwRingColor";
 import { getTwRingOpacity } from "./functions/getTwRingOpacity";
+import { cssSpecialColor, type CssSpecialColor } from "./data/cssSpecialColors";
+import { getTwSpecialColor } from "./functions/getTwSpecialColor";
+import { fullConfig } from "./tailwindConfig";
+import { getTwGapX } from "./functions/getTwGapX";
 
 type FormatFunction = (twRule: TwRule) => string | undefined;
 
@@ -402,6 +406,31 @@ export const customFormat = (twRule: TwRule) => {
       return undefined;
     },
     (twRule) => {
+      // ring-TwColor
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { --tw-ring-color: (${cssSpecialColor}); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 2) {
+          return undefined;
+        }
+        const specialColor = regexResult[1] as CssSpecialColor;
+
+        const ringColors = fullConfig.theme.ringColor;
+        if (!ringColors) {
+          throw Error("ring colors not set!");
+        }
+
+        const ringColor = getTwSpecialColor(specialColor, ringColors);
+
+        return `ring-${ringColor}`;
+      }
+
+      return undefined;
+    },
+    (twRule) => {
       // ring-TwColor/[0-9.]*
       const regexResult = new RegExp(
         `^\\.[a-z]* { --tw-ring-color: rgb\\(([0-9]{1,3}) ([0-9]{1,3}) ([0-9]{1,3}) \\/ ([0-9.]*)\\); }$`,
@@ -457,6 +486,55 @@ export const customFormat = (twRule: TwRule) => {
         const ringOffsetWidth = regexResult[1];
 
         return getTwRingWidth(ringOffsetWidth);
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // sr-only
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect\\(0, 0, 0, 0\\); white-space: nowrap; border-width: 0; }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        return "sr-only";
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // bg-clip-text
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { -webkit-background-clip: text; background-clip: text; }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        return "bg-clip-text";
+      }
+
+      return undefined;
+    },
+    (twRule) => {
+      // -?gap-x-[0-9]*
+      const regexResult = new RegExp(
+        `^\\.[a-z]* { -moz-column-gap: (-?[0-9.]*(${cssUnits})); column-gap: (-?[0-9.]*(${cssUnits})); }$`,
+        "g"
+      ).exec(twRule.cssText);
+
+      if (regexResult) {
+        if (regexResult.length < 5) {
+          return undefined;
+        }
+        const mozValue = regexResult[1];
+        const value = regexResult[3];
+
+        if (mozValue !== value) {
+          return undefined;
+        }
+
+        return getTwGapX(value);
       }
 
       return undefined;

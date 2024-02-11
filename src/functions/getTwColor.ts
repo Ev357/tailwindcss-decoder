@@ -43,9 +43,8 @@ export const getTwColor = (red: string, green: string, blue: string, source?: Re
     }
   }
 
-
   if (!twColor) {
-    return `${hexColor}`;
+    return `[${hexColor}]`;
   }
 
   return `${twColor}${twShade ? `-${twShade}` : ""}`;
