@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Tailwind Decoder",
-  "description": "Tailwind Decoder",
+  "name": "Tailwind Decompiler",
+  "description": "Tailwind Decompiler",
   "version": "1.0",
   "action": {
     "default_icon": {

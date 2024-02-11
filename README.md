@@ -1,4 +1,4 @@
-# tailwindcss-decoder
+# tailwindcss-decompiler
 
 To install dependencies:
 
