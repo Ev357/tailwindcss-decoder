@@ -135,6 +135,7 @@ export const replaceData = async (
   const prettifiedHtml = await format(decompiledDiv.innerHTML, {
     parser: "html",
     plugins: [parserHtml],
+    htmlWhitespaceSensitivity: "ignore",
   });
 
   clipboardDiv.addEventListener("click", () =>
