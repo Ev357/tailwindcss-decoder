@@ -1,4 +1,4 @@
-import { loadCss } from "./loadCss";
+import { loadCss, type WrongClass } from "./loadCss";
 import { getDecompiledElement } from "./getDecompiledElement";
 import { replaceData } from "./replaceData";
 
@@ -11,12 +11,35 @@ import { replaceData } from "./replaceData";
     }
   });
 
-  await paidSections.forEach(async (section) => {
-    await loadCss(section);
-    const decompiledDiv = await getDecompiledElement(section);
-    if (!decompiledDiv) {
-      return;
-    }
-    replaceData(section, decompiledDiv);
-  });
+  const wrongClasses: WrongClass[] = [];
+
+  await Promise.allSettled(
+    paidSections.map(async (section) => {
+      const wrongSectionClasses = await loadCss(section);
+      const decompiledDiv = await getDecompiledElement(section);
+      if (!decompiledDiv) {
+        return;
+      }
+      replaceData(section, decompiledDiv);
+
+      if (!wrongSectionClasses) {
+        return;
+      }
+
+      wrongClasses.push(...wrongSectionClasses);
+    })
+  );
+
+  if (wrongClasses.length) {
+    const filteredMap = wrongClasses.reduce<Record<string, WrongClass>>(
+      (wrongClasses, wrongClass) => {
+        wrongClasses[wrongClass.compiledClass] = wrongClass;
+        return wrongClasses;
+      },
+      {}
+    );
+    const filteredWrongClasses = Object.values(filteredMap);
+
+    console.warn("Failed to decompile classes:", filteredWrongClasses);
+  }
 })();

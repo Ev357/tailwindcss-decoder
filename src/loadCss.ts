@@ -14,6 +14,12 @@ export interface TwAtRule extends TwRule {
   breakpoint: string;
 }
 
+export interface WrongClass {
+  compiledClass: string;
+  decompiledClasses: string[];
+  cssText: string;
+}
+
 const storeClasses = async (classes: Record<string, string>) =>
   await chrome.storage.local.set(classes);
 
@@ -96,6 +102,8 @@ export const loadCss = async (section: Element) => {
     tailwindConfig,
   });
 
+  const wrongClasses: WrongClass[] = [];
+
   let chucksCount = 20;
   let chunkSize = Math.floor(twRules[0].length / chucksCount);
   for (let i = 0; i < twRules[0].length; i += chunkSize) {
@@ -120,7 +128,16 @@ export const loadCss = async (section: Element) => {
           return;
         }
 
-        chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses.join(" ");
+        const newClass = nodes[0].tailwindClasses;
+        if (newClass.length > 1 || newClass.length === 0) {
+          wrongClasses.push({
+            compiledClass: twRule.rule.selector,
+            decompiledClasses: newClass,
+            cssText: twRule.cssText,
+          });
+        }
+
+        chunkClasses[twRule.rule.selector] = newClass.join(" ");
       })
     );
 
@@ -152,12 +169,27 @@ export const loadCss = async (section: Element) => {
           return;
         }
 
-        chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses
-          .map((twClass) => `${twRule.breakpoint}:${twClass}`)
-          .join(" ");
+        const newClass = nodes[0].tailwindClasses.map(
+          (twClass) => `${twRule.breakpoint}:${twClass}`
+        );
+        if (
+          newClass.length > 1 ||
+          newClass.length === 0 ||
+          newClass.some((c) => c.includes("--tw-"))
+        ) {
+          wrongClasses.push({
+            compiledClass: twRule.rule.selector,
+            decompiledClasses: newClass,
+            cssText: twRule.cssText,
+          });
+        }
+
+        chunkClasses[twRule.rule.selector] = newClass.join(" ");
       })
     );
 
     await storeClasses(chunkClasses);
   }
+
+  return wrongClasses;
 };
