@@ -5,15 +5,7 @@ import parserHtml from "prettier/parser-html";
 import hljs from "highlight.js/lib/core";
 import hljsXml from "highlight.js/lib/languages/xml";
 import { createCodeElement } from "./helpers/createCodeElement";
-
-const openTabClasses =
-  "flex items-center rounded-md bg-white py-[0.4375rem] pl-2 pr-2 text-sm font-semibold shadow lg:pr-3";
-
-const closedTabClasses =
-  "flex items-center rounded-md py-[0.4375rem] pl-2 pr-2 text-sm font-semibold lg:pr-3";
-
-const getButtonState = (button: HTMLButtonElement) =>
-  button.getAttribute("data-headlessui-state") === "selected";
+import { switchCode } from "./helpers/switchCode";
 
 const copyComponent = (html: string, divButton: HTMLDivElement) => {
   let isSuccess: boolean;
@@ -44,42 +36,6 @@ const copyComponent = (html: string, divButton: HTMLDivElement) => {
     copyButtonDiv.setAttribute("class", "");
     copiedButtonDiv.setAttribute("class", "hidden");
   }, 2000);
-};
-
-const switchCode = (
-  buttonType: "preview" | "code",
-  event: MouseEvent,
-  otherButton: HTMLButtonElement,
-  previewDiv: HTMLDivElement,
-  codePre: HTMLPreElement
-) => {
-  const target = <HTMLButtonElement | null>event.currentTarget;
-  if (!target) {
-    return;
-  }
-
-  const isSelected = getButtonState(target);
-  if (isSelected) {
-    return;
-  }
-
-  target.setAttribute("data-headlessui-state", "selected");
-  target.setAttribute("aria-selected", "true");
-  target.setAttribute("class", openTabClasses);
-
-  otherButton.setAttribute("data-headlessui-state", "");
-  otherButton.setAttribute("aria-selected", "false");
-  otherButton.setAttribute("class", closedTabClasses);
-
-  if (buttonType === "code") {
-    codePre.classList.remove("hidden");
-    previewDiv.classList.add("hidden");
-  }
-
-  if (buttonType === "preview") {
-    previewDiv.classList.remove("hidden");
-    codePre.classList.add("hidden");
-  }
 };
 
 export const replaceData = async (
