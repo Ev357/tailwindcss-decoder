@@ -17,6 +17,6 @@ import { replaceData } from "./replaceData";
     if (!decompiledDiv) {
       return;
     }
-    replaceData(section, decompiledDiv)
+    replaceData(section, decompiledDiv);
   });
 })();

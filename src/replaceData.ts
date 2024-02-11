@@ -1,5 +1,7 @@
 import { panelHtml } from "./html/panel";
 import { createElement } from "./helpers/createElement";
+import { format } from "prettier";
+import parserHtml from "prettier/parser-html";
 
 const openTabClasses =
   "flex items-center rounded-md bg-white py-[0.4375rem] pl-2 pr-2 text-sm font-semibold shadow lg:pr-3";
@@ -9,6 +11,37 @@ const closedTabClasses =
 
 const getButtonState = (button: HTMLButtonElement) =>
   button.getAttribute("data-headlessui-state") === "selected";
+
+const copyComponent = (html: string, divButton: HTMLDivElement) => {
+  let isSuccess: boolean;
+  try {
+    navigator.clipboard.writeText(html);
+    isSuccess = true;
+  } catch (_) {
+    isSuccess = false;
+  }
+
+  if (!isSuccess) {
+    return;
+  }
+
+  const copyButtonDiv: HTMLDivElement | null = divButton.querySelector(
+    "div[data-type=copy]"
+  );
+  const copiedButtonDiv: HTMLDivElement | null = divButton.querySelector(
+    "div[data-type=copied]"
+  );
+  if (!copyButtonDiv || !copiedButtonDiv) {
+    return;
+  }
+
+  copyButtonDiv.setAttribute("class", "hidden");
+  copiedButtonDiv.setAttribute("class", "");
+  setTimeout(() => {
+    copyButtonDiv.setAttribute("class", "");
+    copiedButtonDiv.setAttribute("class", "hidden");
+  }, 2000);
+};
 
 const switchCode = (
   buttonType: "preview" | "code",
@@ -34,7 +67,7 @@ const switchCode = (
   otherButton.setAttribute("class", closedTabClasses);
 };
 
-export const replaceData = (
+export const replaceData = async (
   section: Element,
   decompiledDiv: HTMLDivElement
 ) => {
@@ -77,7 +110,10 @@ export const replaceData = (
   const codeButton: HTMLButtonElement | null = panel.querySelector(
     "button[aria-selected=false]"
   );
-  if (!previewButton || !codeButton) {
+  const clipboardDiv: HTMLDivElement | null = panel.querySelector(
+    "div[data-state=copy]"
+  );
+  if (!previewButton || !codeButton || !clipboardDiv) {
     return;
   }
 
@@ -86,5 +122,14 @@ export const replaceData = (
   );
   codeButton.addEventListener("click", (event) =>
     switchCode("code", event, previewButton)
+  );
+
+  const prettifiedHtml = await format(decompiledDiv.innerHTML, {
+    parser: "html",
+    plugins: [parserHtml],
+  });
+
+  clipboardDiv.addEventListener("click", () =>
+    copyComponent(prettifiedHtml, clipboardDiv)
   );
 };

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "css-to-tailwindcss": "^1.0.5",
-    "postcss": "^8.4.34"
+    "postcss": "^8.4.34",
+    "prettier": "^3.2.5"
   }
 }
