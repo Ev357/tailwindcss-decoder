@@ -54,11 +54,6 @@ export const loadCss = async (section: Element) => {
           return twRules;
         }
 
-        // // TODO Remove
-        // if (node.selector.startsWith(".avq")) {
-        //   console.log(cssText);
-        // }
-
         twRules[0].push({ rule: node, cssText });
       }
 
@@ -122,10 +117,6 @@ export const loadCss = async (section: Element) => {
 
         if (!nodes.length) {
           return;
-        }
-
-        if (nodes[0].tailwindClasses.join(" ").includes("-moz-column-g")) {
-          console.log(nodes[0].tailwindClasses, twRule);
         }
 
         chunkClasses[twRule.rule.selector] = nodes[0].tailwindClasses.join(" ");

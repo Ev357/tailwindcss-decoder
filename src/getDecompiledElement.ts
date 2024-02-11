@@ -1,16 +1,11 @@
+import { createElement } from "./helpers/createElement";
+
 const getClasses = async (classNames: string[]) => {
   const decodedClasses: Record<string, string> = await chrome.storage.local.get(
     classNames
   );
 
   return Object.values(decodedClasses).filter(Boolean);
-};
-
-const createElement = (html: string) => {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-
-  return div;
 };
 
 export const getDecompiledElement = async (section: Element) => {
@@ -54,6 +49,5 @@ export const getDecompiledElement = async (section: Element) => {
     })
   );
 
-  console.log(element.innerHTML);
-  //console.log(await getClasses([".b"]));
+  return element;
 };

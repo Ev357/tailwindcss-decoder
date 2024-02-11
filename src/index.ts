@@ -1,5 +1,6 @@
 import { loadCss } from "./loadCss";
 import { getDecompiledElement } from "./getDecompiledElement";
+import { replaceData } from "./replaceData";
 
 (async () => {
   const sections = document.querySelectorAll("section[id^=component-]");
@@ -12,6 +13,10 @@ import { getDecompiledElement } from "./getDecompiledElement";
 
   await [paidSections[5]].forEach(async (section) => {
     await loadCss(section);
-    getDecompiledElement(section);
+    const decompiledDiv = await getDecompiledElement(section);
+    if (!decompiledDiv) {
+      return;
+    }
+    replaceData(section, decompiledDiv)
   });
 })();
