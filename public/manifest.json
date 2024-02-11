@@ -21,28 +21,18 @@
     "storage"
   ],
   "host_permissions": [
-    "https://tailwindui.com/*"
+    "https://tailwindui.com/components/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://tailwindui.com/*"
+        "https://tailwindui.com/components/*"
       ],
       "js": [
         "index.js"
       ],
       "css": [
         "./css/theme.css"
-      ]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "compiled.css"
-      ],
-      "matches": [
-        "https://tailwindui.com/*"
       ]
     }
   ]
