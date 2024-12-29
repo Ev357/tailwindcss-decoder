@@ -1,0 +1,15 @@
+{
+	"name": "tailwindcss-decompiler",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"format": "biome format --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	}
+}
