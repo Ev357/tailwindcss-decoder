@@ -5,11 +5,13 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+    contents: write
+
 jobs:
   build-and-release:
     name: Build and Publish Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
