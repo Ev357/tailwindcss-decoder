@@ -4,7 +4,7 @@
 
 An extension that enables free access to Tailwind UI.
 
-# Note
+## Note
 This project does not work right now because Tailwind UI started using tailwindcss v4 and this broke bunch of things.
 
 I don't really know if i want to fix it, its an old project, and i think i would be better rewriting it from scratch again.
