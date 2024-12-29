@@ -6,7 +6,7 @@ on:
       - "v*.*.*"
 
 permissions:
-    contents: write
+  contents: write
 
 jobs:
   build-and-release:
@@ -27,11 +27,10 @@ jobs:
       - name: Build the project
         run: bun run build
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist/
+      - name: Compress dist folder
+        run: tar -czf dist.tar.gz -C dist .
 
       - name: Release
         uses: softprops/action-gh-release@v2
+        with:
+          files: dist.tar.gz
