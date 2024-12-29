@@ -1,22 +1,24 @@
 {
-  "name": "tailwindcss-decoder",
-  "module": "index.ts",
-  "type": "module",
-  "scripts": {
-    "build": "mkdir -p dist && cp -r ./public/* ./dist && bun build ./src/index.ts --minify --splitting --outdir dist/"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "chrome-types": "^0.1.327",
-    "tailwindcss": "^3.4.17"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "css-to-tailwindcss": "^1.0.5",
-    "highlight.js": "^11.11.1",
-    "postcss": "^8.4.49",
-    "prettier": "^3.4.2"
-  }
+	"name": "tailwindcss-decoder",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"build": "mkdir -p dist && cp -r ./public/* ./dist && bun build ./src/index.ts --minify --splitting --outdir dist/",
+		"format": "biome format --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/bun": "latest",
+		"chrome-types": "^0.1.327",
+		"tailwindcss": "^3.4.17"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"css-to-tailwindcss": "^1.0.5",
+		"highlight.js": "^11.11.1",
+		"postcss": "^8.4.49",
+		"prettier": "^3.4.2"
+	}
 }
