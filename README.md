@@ -4,6 +4,13 @@
 
 An extension that enables free access to Tailwind UI.
 
+# Note
+This project does not work right now because Tailwind UI started using tailwindcss v4 and this broke bunch of things.
+
+I don't really know if i want to fix it, its an old project, and i think i would be better rewriting it from scratch again.
+
+Another thing is, that i respect the Tailwind team and what they do, and this thing does not really help them.
+
 ## Installation
 
 1. Download the latest [release](https://github.com/Ev357/tailwindcss-decompiler/releases).
@@ -28,5 +35,5 @@ This extensions takes the "encrypted" paid Tailwind UI code:
 
 And decrypts it to the original code:
 ```html
-it does not work right now for some reason
+i could not get an example, because as in time of writing this README, it stopped working as stated above.
 ```
