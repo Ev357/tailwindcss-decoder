@@ -31,10 +31,5 @@ jobs:
           name: dist
           path: dist/
 
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: dist
-          tag: ${{ github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
+      - name: Release
+        uses: softprops/action-gh-release@v2
