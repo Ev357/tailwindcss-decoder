@@ -28,7 +28,7 @@ jobs:
         run: bun run build
 
       - name: Compress dist folder
-        run: zip -r tailwindcss-decompiler.zip dist/*
+        run: cd dist && zip -r ../tailwindcss-decompiler.zip .
 
       - name: Release
         uses: softprops/action-gh-release@v2
