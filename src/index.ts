@@ -16,7 +16,7 @@ const getUtilities = (css: string) => {
 	) as AtRule | undefined;
 
 	if (utilitiesLayer?.nodes) {
-		const page = 8;
+		const page = 15;
 		return utilitiesLayer.nodes.splice(page * 5, page * 5 + 5); // TODO: remove after testing
 	}
 
