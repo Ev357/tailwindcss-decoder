@@ -2,6 +2,8 @@ import type { Declaration } from "postcss";
 import { getJITValue } from "./utils/get-jit-value";
 import { getTopRightBottomLeftClass } from "./props/get-top-right-bottom-left-class";
 import { applyNegative } from "./utils/apply-negative";
+import { getSpacing } from "./utils/get-spacing";
+import { applySpacing } from "./utils/apply-spacing";
 
 export const parsers: Record<
 	string,
@@ -204,6 +206,174 @@ export const parsers: Record<
 
 				if (value) {
 					return value;
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	margin: (decl: Declaration) => {
+		const prefix = "m";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-inline": (decl: Declaration) => {
+		const prefix = "mx";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-block": (decl: Declaration) => {
+		const prefix = "my";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-top": (decl: Declaration) => {
+		const prefix = "mt";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-bottom": (decl: Declaration) => {
+		const prefix = "mb";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-right": (decl: Declaration) => {
+		const prefix = "mr";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
+				}
+
+				return getJITValue(decl);
+			}
+		}
+	},
+	"margin-left": (decl: Declaration) => {
+		const prefix = "ml";
+		switch (decl.value) {
+			case "auto":
+				return `${prefix}-auto`;
+			case "1px":
+				return `${prefix}-px`;
+			case "-1px":
+				return `-${prefix}-px`;
+			case "100%":
+				return `${prefix}-full`;
+			case "-100%":
+				return `-${prefix}-full`;
+			default: {
+				const spacing = getSpacing(decl);
+
+				if (spacing !== undefined) {
+					return applySpacing(prefix, spacing);
 				}
 
 				return getJITValue(decl);
